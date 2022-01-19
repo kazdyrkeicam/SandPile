@@ -1,6 +1,4 @@
-from logging.handlers import WatchedFileHandler
-from tkinter import RIGHT
-import pygame, numpy
+import pygame, numpy, random
 
 
 SCREEN_WIDTH = 480
@@ -10,8 +8,7 @@ GRIDSIZE = 20
 GRID_WIDTH = int(SCREEN_HEIGHT / GRIDSIZE)
 GRID_HEIGHT = int(SCREEN_WIDTH / GRIDSIZE)
 
-LIGHT = (93, 216, 228)
-DARK = (84, 194, 205)
+LIGHT, DARK = (93, 216, 228), (84, 194, 205)
 
 UP = (0, -GRIDSIZE)
 DOWN = (0, GRIDSIZE)
@@ -75,8 +72,8 @@ class Sand():
         pygame.draw.rect(surface, LIGHT, r, 1)
 
 
-    def randomize_position():
-        pass
+    def randomize_position(self):
+        self.position[0] = ( random.randint(0, GRID_WIDTH-1) * GRIDSIZE, random.randint(0, GRID_HEIGHT-1) * GRIDSIZE )
     
     def get_position(self):
         return self.position
@@ -117,6 +114,25 @@ class Sand():
             field.set_occupied(self.get_index())
 
 
+class Limit():
+    def __init__(self) -> None:
+        self.index = (12, 5)
+        self.color = (153, 153, 153)
+    
+
+    def set_limit(self, field):
+        field.set_occupied(self.index)
+    
+
+    def randomize_index(self):
+        self.index = ( random.randint(0, GRID_WIDTH-1), random.randint(0, GRID_HEIGHT-1) )
+    
+
+    def draw(self, surface):
+        r = pygame.Rect( (self.index[0] * GRIDSIZE, self.index[1] * GRIDSIZE), (GRIDSIZE, GRIDSIZE) )
+        pygame.draw.rect(surface, self.color, r)
+
+
 
 
 def drawGrid(surface):
@@ -143,25 +159,30 @@ def main():
 
     game_board = Field()
     sandpile = []
+    limits = []
 
-    # game_board.matrix[12, 7] = OCCUPIED
-    # game_board.matrix[11, 7] = OCCUPIED
+    for i in range(10):
+        limits.append(Limit())
+        limits[i].randomize_index()
+        limits[i].set_limit(game_board)
 
     counter = 1
     ticker = 20
+
     run = True
     while run:
         clock.tick(ticker)
 
         if counter % 2:
             sand = Sand()
+            sand.randomize_position()
             sandpile.append(sand)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                ticker = 1
+                ticker = 3
             elif event.type == pygame.MOUSEBUTTONUP:
                 ticker = 15
         
@@ -170,6 +191,9 @@ def main():
         for sand in sandpile:
             sand.draw(surface)
             sand.update(game_board)
+        
+        for limit in limits:
+            limit.draw(surface)
 
         counter += 1
         screen.blit(surface, (0, 0))
