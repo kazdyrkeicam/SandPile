@@ -15,8 +15,8 @@ DARK = (84, 194, 205)
 
 UP = (0, -GRIDSIZE)
 DOWN = (0, GRIDSIZE)
-LEFT = (-GRIDSIZE, 0)
-RIGHT = (GRIDSIZE, 0)
+LEFT = (-GRIDSIZE, GRIDSIZE)
+RIGHT = (GRIDSIZE, GRIDSIZE)
 STAY = None
 
 OCCUPIED, FREE = 0, 1
@@ -35,11 +35,11 @@ class Field():
     
 
     def set_occupied(self, index):
-        self.matrix[index[0]][index[1]] = OCCUPIED
+        self.matrix[ int(index[0]) ][ int(index[1]) ] = OCCUPIED
 
 
     def set_free(self, index):
-        self.matrix[index[0]][index[1]] = FREE
+        self.matrix[ int(index[0]) ][ int(index[1]) ] = FREE
     
 
     def not_occupied(self, index):
@@ -55,15 +55,6 @@ class Field():
 
     def element_equals_to(self, x, y, element):
         return self.matrix[int(x), int(y)] == element
-    
-
-    # def __getitem__(self, index):
-    #     '''
-    #         This method is needed to get items from an array
-    #     '''
-    #     # if self.is_inside(index):
-    #     return self.matrix[]
-
 
 
 
@@ -117,14 +108,14 @@ class Sand():
         
 
     def update(self, field):
-        print(self.get_position())
-        print(self.get_index())
-
         direction = self.check_below(field)
         if direction != STAY:
+            field.set_free(self.get_index())
             new = (direction[0] + self.position[0][0], direction[1] + self.position[0][1])
             self.position.insert( 0, new )
             self.position.pop()
+            field.set_occupied(self.get_index())
+
 
 
 
@@ -150,25 +141,37 @@ def main():
     surface = surface.convert()
     drawGrid(surface)
 
-    sandpile = Field()
-    sand = Sand()
+    game_board = Field()
+    sandpile = []
 
-    sandpile.matrix[12, 7] = OCCUPIED
-    sandpile.matrix[11, 7] = OCCUPIED
+    # game_board.matrix[12, 7] = OCCUPIED
+    # game_board.matrix[11, 7] = OCCUPIED
 
+    counter = 1
+    ticker = 20
     run = True
     while run:
-        clock.tick(10)
+        clock.tick(ticker)
+
+        if counter % 2:
+            sand = Sand()
+            sandpile.append(sand)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                ticker = 1
+            elif event.type == pygame.MOUSEBUTTONUP:
+                ticker = 15
+        
         drawGrid(surface)
-        sand.draw(surface)
 
-        sand.update(sandpile)
+        for sand in sandpile:
+            sand.draw(surface)
+            sand.update(game_board)
 
+        counter += 1
         screen.blit(surface, (0, 0))
         pygame.display.update()
 
