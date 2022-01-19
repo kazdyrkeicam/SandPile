@@ -51,7 +51,8 @@ class Field():
     
 
     def element_equals_to(self, x, y, element):
-        return self.matrix[int(x), int(y)] == element
+        if self.is_inside( (x, y) ):
+            return self.matrix[int(x), int(y)] == element
 
 
 
