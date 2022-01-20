@@ -32,7 +32,7 @@ def get_matrix_from_file(path):
     for line in range(len(lines) - 1):
         lines[line] = lines[line][:-1]
 
-    GRID_WIDTH = len(lines[0]) + 1
+    GRID_WIDTH = len(lines[0])
     GRID_HEIGHT = len(lines) + 1
     SCREEN_WIDTH = GRID_WIDTH * GRIDSIZE
     SCREEN_HEIGHT = GRID_HEIGHT * GRIDSIZE
@@ -182,7 +182,7 @@ def drawGrid(surface):
 
 def main():
 
-    limits_indexes = get_matrix_from_file('test2.txt')
+    limits_indexes = get_matrix_from_file('test_skosy.txt')
 
     pygame.init()
 
