@@ -1,5 +1,6 @@
 import pygame, numpy, random
 
+FILE = 'test_skosy.txt'
 
 SCREEN_WIDTH = 0
 SCREEN_HEIGHT = 0
@@ -182,7 +183,7 @@ def drawGrid(surface):
 
 def main():
 
-    limits_indexes = get_matrix_from_file('test_skosy.txt')
+    limits_indexes = get_matrix_from_file(FILE)
 
     pygame.init()
 
