@@ -1,12 +1,12 @@
 import pygame, numpy, random
 
 
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 0
+SCREEN_HEIGHT = 0
 
 GRIDSIZE = 20
-GRID_WIDTH = int(SCREEN_HEIGHT / GRIDSIZE)
-GRID_HEIGHT = int(SCREEN_WIDTH / GRIDSIZE)
+GRID_WIDTH = 0
+GRID_HEIGHT = 0
 
 LIGHT, DARK = (93, 216, 228), (84, 194, 205)
 
@@ -17,6 +17,34 @@ RIGHT = (GRIDSIZE, GRIDSIZE)
 STAY = None
 
 OCCUPIED, FREE = 0, 1
+
+
+def get_matrix_from_file(path):
+    # get file data
+    # set width and height
+    # get limits indexes
+    lines = []
+    global GRID_HEIGHT, GRID_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH
+
+    with open(path) as file:
+        lines = file.readlines()
+
+    for line in range(len(lines) - 1):
+        lines[line] = lines[line][:-1]
+
+    GRID_WIDTH = len(lines[0]) + 1
+    GRID_HEIGHT = len(lines) + 1
+    SCREEN_WIDTH = GRID_WIDTH * GRIDSIZE
+    SCREEN_HEIGHT = GRID_HEIGHT * GRIDSIZE
+    
+    limits_indexes = []
+    for i in range(len(lines)):
+        for j in range(len(lines[i])):
+            if lines[i][j] == '1':
+                limits_indexes.append( (j, i) )
+
+    return limits_indexes
+    
 
 
 class Field():
@@ -74,7 +102,7 @@ class Sand():
 
 
     def randomize_position(self):
-        self.position[0] = ( random.randint(0, GRID_WIDTH-1) * GRIDSIZE, random.randint(0, GRID_HEIGHT-1) * GRIDSIZE )
+        self.position[0] = ( random.randint(0, GRID_WIDTH-1) * GRIDSIZE, 0 * GRIDSIZE )
     
     def get_position(self):
         return self.position
@@ -125,6 +153,10 @@ class Limit():
         field.set_occupied(self.index)
     
 
+    def set_index(self, index):
+        self.index = index
+    
+
     def randomize_index(self):
         self.index = ( random.randint(0, GRID_WIDTH-1), random.randint(0, GRID_HEIGHT-1) )
     
@@ -149,6 +181,9 @@ def drawGrid(surface):
 
 
 def main():
+
+    limits_indexes = get_matrix_from_file('test2.txt')
+
     pygame.init()
 
     clock = pygame.time.Clock()
@@ -162,9 +197,9 @@ def main():
     sandpile = []
     limits = []
 
-    for i in range(10):
+    for i in range(len(limits_indexes)):
         limits.append(Limit())
-        limits[i].randomize_index()
+        limits[i].set_index(limits_indexes[i])
         limits[i].set_limit(game_board)
 
     counter = 1
@@ -185,7 +220,7 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 ticker = 3
             elif event.type == pygame.MOUSEBUTTONUP:
-                ticker = 15
+                ticker = 20
         
         drawGrid(surface)
 
